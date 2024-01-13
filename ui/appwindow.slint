@@ -1,0 +1,160 @@
+import { Button, VerticalBox , GridBox, HorizontalBox} from "std-widgets.slint";
+
+
+export component Tile inherits Rectangle {
+    in property<int> value: 0;
+    width: 64px;
+    height: 64px;
+    background: get_color();
+    
+    Text {
+        text: value;
+        font-size: 30px;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+
+    function get_color() -> brush {
+        if (value == 0) {return #C8C8C8;}
+        else if (value == 2) {return #EEE4DA;}
+        else if (value == 4) {return #EDE0C8;}
+        else if (value == 8) {return #F2B179;}
+        else if (value == 16) {return #F59563;}
+        else if (value == 32) {return #F67C5F;}
+        else if (value == 64) {return #F65E3B;}
+        else if (value == 128) {return #EDCF72;}
+        else if (value == 256) {return #EDCC61;}
+        else if (value == 512) {return #EDC850;}
+        else if (value == 1024) {return #EDC53F;}
+        else if (value == 2048) {return #EDC22E;}
+        else {return #3C3A32;}
+    }
+}
+
+
+export component Board inherits Rectangle {
+    in-out property<[int]> values;
+    GridBox {
+        padding: 0px;
+        spacing: 8px;
+        Row {
+            Tile {
+                value: values[0];
+            }
+            Tile {
+                value: values[1];
+            }
+            Tile {
+                value: values[2];
+            }
+            Tile {
+                value: values[3];
+            }
+        }
+        Row {
+            Tile {
+                value: values[4];
+            }
+            Tile {
+                value: values[5];
+            }
+            Tile {
+                value: values[6];
+            }
+            Tile {
+                value: values[7];
+            }
+        }
+        Row {
+            Tile {
+                value: values[8];
+            }
+            Tile {
+                value: values[9];
+            }
+            Tile {
+                value: values[10];
+            }
+            Tile {
+                value: values[11];
+            }
+        }
+        Row {
+            Tile {
+                value: values[12];
+            }
+            Tile {
+                value: values[13];
+            }
+            Tile {
+                value: values[14];
+            }
+            Tile {
+                value: values[15];
+            }
+        }
+    }
+} 
+
+
+export component AppWindow inherits Window {
+    in property<int> score: 0;
+    in-out property<[int]> values: [0, 2, 4, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    in property <string> seed: 0;
+
+    callback restart(string);
+    callback play(int);
+
+    title: "2048 in Rust";
+    VerticalBox {
+        padding: 16px;
+        Text {
+            text: "2048";
+            font-size: 30px;
+            horizontal-alignment: center;
+        }
+        Text {
+            text: "Score: " + score;
+            font-size: 20px;
+        }
+        Board {
+            values: values;
+        }
+
+        HorizontalBox {
+            spacing: 8px;
+            seed_input := TextInput {
+                text: seed;
+            }
+            Button {
+                text: "Restart";
+                clicked => {
+                    restart(seed_input.text);
+                }
+            }
+        }
+    }
+
+    my-key-handler := FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.UpArrow) {
+                play(0);
+                debug("Up key was pressed")
+            } else if (event.text == Key.DownArrow) {
+                play(2);
+                debug("Down key was pressed")
+            } else if (event.text == Key.LeftArrow) {
+                play(1);
+                debug("Left key was pressed")
+            } else if (event.text == Key.RightArrow) {
+                play(3);
+                debug("Right key was pressed")
+            } else if (event.text == Key.Escape) {
+                debug("Esc key was pressed")
+            }
+            accept
+        }
+    }
+
+
+}
