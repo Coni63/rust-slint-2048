@@ -6,16 +6,18 @@ export component Tile inherits Rectangle {
     width: 64px;
     height: 64px;
     background: get_color();
+    border-radius: 4px;
     
     Text {
-        text: value;
-        font-size: 30px;
+        text: value > 0 ? value : "";
+        color: value > 2048 ? #F9F6F2 : #3C3A32;
+        font-size: value < 1000 ? 30px : value < 10000 ? 25px : 20px;
         horizontal-alignment: center;
         vertical-alignment: center;
     }
 
     function get_color() -> brush {
-        if (value == 0) {return #C8C8C8;}
+        if (value == 0) {return #C0B3A6;}
         else if (value == 2) {return #EEE4DA;}
         else if (value == 4) {return #EDE0C8;}
         else if (value == 8) {return #F2B179;}
@@ -99,8 +101,9 @@ export component Board inherits Rectangle {
 
 export component AppWindow inherits Window {
     in property<int> score: 0;
-    in-out property<[int]> values: [0, 2, 4, 8, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    in-out property<[int]> values: [0, 2, 4, 8, 16, 32, 64, 128, 1024, 4096, 8192, 16384, 65536, 262144, 0, 0];
     in property <string> seed: 0;
+    background: #AD9D90;
 
     callback restart(string);
     callback play(int);
@@ -112,10 +115,12 @@ export component AppWindow inherits Window {
             text: "2048";
             font-size: 30px;
             horizontal-alignment: center;
+            color: #3C3A32;
         }
         Text {
             text: "Score: " + score;
             font-size: 20px;
+            color: #3C3A32;
         }
         Board {
             values: values;
@@ -123,8 +128,16 @@ export component AppWindow inherits Window {
 
         HorizontalBox {
             spacing: 8px;
-            seed_input := TextInput {
-                text: seed;
+            VerticalBox {
+                spacing: 0px;
+                Text {
+                    text: "Seed:";
+                }            
+                seed_input := TextInput {
+                    text: seed;
+                    color: #3C3A32;
+                    font-size: 20px;
+                }
             }
             Button {
                 text: "Restart";
@@ -138,16 +151,16 @@ export component AppWindow inherits Window {
     my-key-handler := FocusScope {
         key-pressed(event) => {
             if (event.text == Key.UpArrow) {
-                play(0);
-                debug("Up key was pressed")
-            } else if (event.text == Key.DownArrow) {
-                play(2);
-                debug("Down key was pressed")
-            } else if (event.text == Key.LeftArrow) {
                 play(1);
+                debug("Up key was pressed")
+            } else if (event.text == Key.LeftArrow) {
+                play(2);
                 debug("Left key was pressed")
-            } else if (event.text == Key.RightArrow) {
+            } else if (event.text == Key.DownArrow) {
                 play(3);
+                debug("Down key was pressed")
+            } else if (event.text == Key.RightArrow) {
+                play(4);
                 debug("Right key was pressed")
             } else if (event.text == Key.Escape) {
                 debug("Esc key was pressed")
@@ -155,6 +168,4 @@ export component AppWindow inherits Window {
             accept
         }
     }
-
-
 }
