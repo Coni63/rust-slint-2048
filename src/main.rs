@@ -28,13 +28,23 @@ fn main() -> Result<(), slint::PlatformError> {
     let game_on_play = Rc::clone(&game);
 
     ui.on_restart(move |seed| {
+        ui_handle2.unwrap().set_game_over(false);
         game_on_restart.borrow_mut().restart(seed.parse().unwrap());
         update_app(ui_handle2.unwrap(), Rc::clone(&game_on_restart));
     });
 
     ui.on_play(move |direction| {
         game_on_play.borrow_mut().apply_action(direction as u8);
+
         update_app(ui_handle3.unwrap(), Rc::clone(&game_on_play));
+
+        if game_on_play.borrow().is_game_over() {
+            ui_handle3.unwrap().set_game_over(true);
+        }
+    });
+
+    ui.on_exit(|| {
+        std::process::exit(0);
     });
 
     // setup and run the UI
